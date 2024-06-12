@@ -1,0 +1,32 @@
+{
+  "name": "node-js-course",
+  "version": "1.0.0",
+  "description": "'Node js complete guide'",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SviatoslavMJS/node-js-course.git"
+  },
+  "author": "Sviatoslav Mykytyn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SviatoslavMJS/node-js-course/issues"
+  },
+  "homepage": "https://github.com/SviatoslavMJS/node-js-course#readme",
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-handlebars": "^7.1.2",
+    "mysql2": "^3.10.0",
+    "pug": "^3.0.2",
+    "sequelize": "^6.37.3"
+  }
+}
