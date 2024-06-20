@@ -1,4 +1,3 @@
-const { where } = require("sequelize");
 const Product = require("../models/product");
 
 exports.getAddProduct = (req, res, next) => {
@@ -14,8 +13,16 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  req.user
-    .createProduct({ title, imageUrl, description, price })
+  const product = new Product(
+    title,
+    imageUrl,
+    description,
+    price,
+    null,
+    req.user._id
+  );
+  product
+    .save(product)
     .then((result) => {
       console.log("Created product");
       res.redirect("/products");
@@ -29,7 +36,7 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect("/");
   }
   const prodId = req.params.productId;
-  req.user.getProducts({ where: { id: prodId } }).then(([product]) => {
+  Product.findById(prodId).then((product) => {
     if (!product) {
       return res.redirect("/");
     }
@@ -48,22 +55,16 @@ exports.postEditProduct = (req, res, next) => {
   const price = req.body.price;
   const imageUrl = req.body.imageUrl;
   const description = req.body.description;
-  Product.update(
-    {
-      title,
-      price,
-      imageUrl,
-      description,
-    },
-    { where: { id } }
-  )
+
+  const product = new Product(title, imageUrl, description, price, id);
+  product
+    .save()
     .then(() => res.redirect("/admin/products"))
     .catch((err) => console.log("UPDATE_ERR", err));
 };
 
 exports.getProducts = (req, res, next) => {
-  req.user
-    .getProducts()
+  Product.fetchAll()
     .then((products) =>
       res.render("admin/products", {
         prods: products,
@@ -76,7 +77,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.postDeleteProduct = (req, res, next) => {
   const id = req.body.productId;
-  Product.destroy({ where: { id } })
+  Product.deleteById(id)
     .then(() => res.redirect("/admin/products"))
     .catch((err) => console.log("Delete", err));
 };

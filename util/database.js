@@ -1,18 +1,21 @@
-// const mysql = require('mysql2');
+const { MongoClient } = require("mongodb");
+require("@dotenvx/dotenvx").config();
 
-// const pool = mysql.createPool({
-//     host: 'localhost',
-//     user: 'root',
-//     database: 'node_complete',
-//     password: 'SvtSQL89$',
-// });
+const connectionUrl = process.env.NODE_MONGO_CONNECTION_URL;
 
-// module.exports = pool.promise();
-const { Sequelize } = require("sequelize");
+const client = new MongoClient(connectionUrl);
 
-const sequelize = new Sequelize("node_complete", "root", "SvtSQL89$", {
-  host: "localhost",
-  dialect: "mysql",
-});
+const mongoConnect = (callback) => {
+  client
+    .connect()
+    .then((clt) => {
+      callback(clt);
+      console.log("SERVER_CONNECTED");
+    })
+    .catch((err) => console.log("CONNECTION_ERR", err));
+};
 
-module.exports = sequelize;
+const getDb = () => client.db('Cluster0');
+
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;
