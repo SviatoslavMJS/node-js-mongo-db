@@ -8,6 +8,7 @@ const User = require("./models/user");
 const shopRoutes = require("./routes/shop");
 const adminRoutes = require("./routes/admin");
 const errorController = require("./controllers/error");
+const authRoutes = require('./routes/auth');
 
 const app = express();
 const connectionUrl = process.env.NODE_MONGO_CONNECTION_URL;
@@ -29,6 +30,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 
 app.use(errorController.get404);
 
