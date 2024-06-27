@@ -1,20 +1,19 @@
 const path = require("path");
 const express = require("express");
 const bodyParser = require("body-parser");
-
-const errorController = require("./controllers/error");
+const mongoose = require("mongoose");
+require("@dotenvx/dotenvx").config();
 
 const User = require("./models/user");
-
-const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
-
-const { mongoConnect } = require("./util/database");
+const adminRoutes = require("./routes/admin");
+const errorController = require("./controllers/error");
 
 const app = express();
+const connectionUrl = process.env.NODE_MONGO_CONNECTION_URL;
 
 app.use((req, res, next) => {
-  User.findById("667423851e39f070c5bb1e28")
+  User.findById("667aa101faad71e7c5e9f1a4")
     .then((user) => {
       req.user = new User(user);
       next();
@@ -33,6 +32,20 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-mongoConnect(() => {
-  app.listen(3000);
-});
+mongoose
+  .connect(connectionUrl)
+  .then((result) => {
+    User.findOne().then((user) => {
+      if (!user) {
+        const user = new User({
+          name: "Sviat MKTN",
+          email: "some.test@example.com",
+          cart: { items: [] },
+        });
+        user.save();
+      }
+    });
+
+    app.listen(3000);
+  })
+  .catch((err) => console.log("CONNECTION_ERR", err));
