@@ -4,6 +4,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const session = require("express-session");
+const flash = require("connect-flash");
 const sessionConnect = require("connect-mongodb-session");
 require("@dotenvx/dotenvx").config();
 
@@ -40,6 +41,7 @@ app.use(
   })
 );
 app.use(csrfProtection);
+app.use(flash());
 
 app.use((req, res, next) => {
   if (!req.session?.user) {
