@@ -35,7 +35,6 @@ exports.getIndex = (req, res, next) => {
         prods: prods,
         pageTitle: "Shop",
         path: "/",
-        isAuthenticated: req.session.isLoggedIn
       });
     })
     .catch((err) => console.log(err));
@@ -97,6 +96,7 @@ exports.postOrder = (req, res, next) => {
         user: {
           name: req.user.name,
           userId: req.user._id,
+          email: req.user.email,
         },
       });
 
