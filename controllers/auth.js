@@ -1,6 +1,18 @@
 const bcrypt = require("bcryptjs");
+const nodeMailer = require("nodemailer");
+const sendgridTransport = require("nodemailer-sendgrid-transport");
+require("@dotenvx/dotenvx").config();
 
 const User = require("../models/user");
+const user = require("../models/user");
+
+const transporter = nodeMailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key: process.env.SEND_GRID_API_KEY,
+    },
+  })
+);
 
 exports.getLogin = (req, res, next) => {
   const [message] = req.flash("error");
@@ -73,8 +85,17 @@ exports.postSignup = (req, res, next) => {
           });
           return user.save();
         })
-        .then(() => res.redirect("/login"));
-    })
+        .then(() => {
+          res.redirect("/login");
 
+          return transporter.sendMail({
+            to: email,
+            from: process.env.SEND_GRID_SENDER_EMAIL,
+            subject: "Signup succeed!",
+            html: "<h1>You successfully singed up<h1>",
+          });
+        })
+        .catch((err) => console.log(err));
+    })
     .catch((err) => console.log(err));
 };
