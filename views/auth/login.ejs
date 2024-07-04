@@ -13,11 +13,23 @@
              <% } %>
             <div class="form-control">
                 <label for="email">E-Mail</label>
-                <input type="email" name="email" id="email">
+                <input 
+                type="email" 
+                name="email" 
+                id="email"  
+                value="<%= values.email %>"
+                class="<%= validationErrors.find(e => e.path === 'email')? 'error': '' %>"
+                />
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <input 
+                type="password" 
+                name="password" 
+                id="password"  
+                value="<%= values.password %>"
+                class="<%= validationErrors.find(e => e.path === 'password')? 'error': '' %>"
+                />
             </div>
             <button class="btn" type="submit">Login</button>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />

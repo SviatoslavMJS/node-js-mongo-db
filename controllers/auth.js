@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const { validationResult } = require("express-validator");
 
 const bcrypt = require("bcryptjs");
 const nodeMailer = require("nodemailer");
@@ -23,17 +24,39 @@ exports.getLogin = (req, res, next) => {
   return res.render("auth/login", {
     path: "/login",
     pageTitle: "Login",
+    validationErrors: [],
     errorMessage: message ?? null,
+    values: { email: "", password: "" },
   });
 };
 
 exports.postLogin = (req, res, next) => {
   const { email, password } = req.body;
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/login", {
+      path: "/login",
+      pageTitle: "Login",
+      values: req.body,
+      validationErrors: errors.array(),
+      errorMessage: errors
+        .array()
+        .map(({ msg }) => msg)
+        .join(", "),
+    });
+  }
+
   User.findOne({ email })
     .then((user) => {
       if (!user) {
-        req.flash("error", "Invalid email or passord!");
-        return res.redirect("/login");
+        return res.status(422).render("auth/login", {
+          path: "/login",
+          pageTitle: "Login",
+          values: req.body,
+          validationErrors: [],
+          errorMessage: "Invalid email or password.",
+        });
       }
       bcrypt
         .compare(password, user.password)
@@ -48,8 +71,13 @@ exports.postLogin = (req, res, next) => {
           }
 
           console.log("WRONG_PASSWORD");
-          req.flash("error", "Invalid email or passord!");
-          return res.redirect("/login");
+          return res.status(422).render("auth/login", {
+            path: "/login",
+            pageTitle: "Login",
+            values: req.body,
+            validationErrors: [],
+            errorMessage: "Invalid email or password.",
+          });
         })
         .catch((err) => console.log("COMPARYING_ERR", err));
     })
@@ -62,44 +90,52 @@ exports.postLogout = (req, res, next) => {
 
 exports.getSignup = (req, res, next) => {
   const [message] = req.flash("error");
+
   res.render("auth/signup", {
     path: "/signup",
     pageTitle: "Signup",
+    validationErrors: [],
     errorMessage: message ?? null,
+    values: { email: "", password: "", confirmPassword: "", name: "" },
   });
 };
 
 exports.postSignup = (req, res, next) => {
   const { name, email, password } = req.body;
-  User.findOne({ email })
-    .then((userData) => {
-      if (userData) {
-        req.flash("error", "Email already used, try another one.");
-        console.log("USER_ALREADY_EXIST");
-        return res.redirect("/signup");
-      }
-      return bcrypt
-        .hash(password, 13)
-        .then((cryptedPas) => {
-          const user = new User({
-            name,
-            email,
-            card: { items: [] },
-            password: cryptedPas,
-          });
-          return user.save();
-        })
-        .then(() => {
-          res.redirect("/login");
+  const errors = validationResult(req);
+  console.log(errors.array());
+  if (!errors.isEmpty()) {
+    return res.status(422).render("auth/signup", {
+      path: "/signup",
+      pageTitle: "Signup",
+      values: req.body,
+      validationErrors: errors.array(),
+      errorMessage: errors
+        .array()
+        .map(({ msg }) => msg)
+        .join(", "),
+    });
+  }
+  return bcrypt
+    .hash(password, 13)
+    .then((cryptedPas) => {
+      const user = new User({
+        name,
+        email,
+        card: { items: [] },
+        password: cryptedPas,
+      });
+      return user.save();
+    })
+    .then(() => {
+      res.redirect("/login");
 
-          return transporter.sendMail({
-            to: email,
-            from: senderEmail,
-            subject: "Signup succeed!",
-            html: "<h1>You successfully singed up<h1>",
-          });
-        })
-        .catch((err) => console.log(err));
+      return transporter.sendMail({
+        to: email,
+        from: senderEmail,
+        subject: "Signup succeed!",
+        html: "<h1>You successfully singed up<h1>",
+      });
     })
     .catch((err) => console.log(err));
 };

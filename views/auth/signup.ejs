@@ -7,25 +7,49 @@
    <%- include('../includes/navigation.ejs') %>
 
     <main>
-        <form class="login-form" action="/signup" method="POST">
+        <form class="login-form" action="/signup" method="POST" novalidate>
             <% if(errorMessage) { %>
                 <p class="user-message user-message--error"><%= errorMessage %></p>
              <% } %>
             <div class="form-control">
                 <label for="name">Name</label>
-                <input type="text" name="name" id="name">
+                <input 
+                type="text" 
+                name="name" 
+                id="name" 
+                value="<%= values.name  %>"
+                class="<%= validationErrors.find(e => e.path === 'name')? 'error': '' %>"
+                />
             </div>
             <div class="form-control">
                 <label for="email">E-Mail</label>
-                <input type="email" name="email" id="email">
+                <input 
+                type="email" 
+                name="email" 
+                id="email" 
+                value="<%= values.email  %>"
+                class="<%= validationErrors.find(e => e.path === 'email')? 'error': '' %>"
+                />
             </div>
             <div class="form-control">
                 <label for="password">Password</label>
-                <input type="password" name="password" id="password">
+                <input 
+                type="password" 
+                name="password" 
+                id="password" 
+                value="<%= values.password  %>" 
+                class="<%= validationErrors.find(e => e.path === 'password')? 'error': '' %>"
+                />
             </div>
             <div class="form-control">
                 <label for="confirmPassword">Confirm Password</label>
-                <input type="password" name="confirmPassword" id="confirmPassword">
+                <input 
+                type="password" 
+                name="confirmPassword" 
+                id="confirmPassword" 
+                value="<%= values.confirmPassword  %>"
+                class="<%= validationErrors.find(e => e.path === 'confirmPassword')? 'error': '' %>"
+                />
             </div>
             <button class="btn" type="submit">Signup</button>
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
