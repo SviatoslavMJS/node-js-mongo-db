@@ -81,7 +81,12 @@ exports.postLogin = (req, res, next) => {
         })
         .catch((err) => console.log("COMPARYING_ERR", err));
     })
-    .catch((err) => console.log("NO_USER", err));
+    .catch((err) => {
+      console.log("NO_USER");
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postLogout = (req, res, next) => {
@@ -137,7 +142,12 @@ exports.postSignup = (req, res, next) => {
         html: "<h1>You successfully singed up<h1>",
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log("SIGN_UP_ERR");
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getReset = (req, res, next) => {
@@ -177,7 +187,12 @@ exports.postReset = (req, res, next) => {
           `,
         });
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log("POST_RESET_ERR");
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
   });
 };
 
@@ -202,7 +217,12 @@ exports.getNewPassword = (req, res, next) => {
         errorMessage: message ?? null,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log("GET_PASS_ERR", err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postNewPassword = (req, res, next) => {
@@ -229,5 +249,10 @@ exports.postNewPassword = (req, res, next) => {
       return resetUser.save();
     })
     .then(() => res.redirect("/login"))
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log("NEW_PASS_ERR");
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
