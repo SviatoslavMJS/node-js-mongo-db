@@ -22,7 +22,7 @@ router.post(
       .trim()
       .isLength({ min: 10, max: 400 }),
     body("price", "Required field").isFloat(),
-    body("imageUrl").isURL(),
+    // body("imageUrl").isURL(),
   ],
   isAuth,
   adminController.postAddProduct
@@ -42,7 +42,7 @@ router.post(
       .trim()
       .isLength({ min: 10, max: 400 }),
     body("price", "Required field").isFloat(),
-    body("imageUrl").isURL(),
+    // body("imageUrl").isURL(),
   ],
   isAuth,
   adminController.postEditProduct

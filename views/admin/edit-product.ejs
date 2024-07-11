@@ -10,7 +10,11 @@
         <% if(errorMessage) { %>
             <p class="user-message user-message--error"><%= errorMessage %></p>
          <% } %>
-        <form class="product-form" action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" method="POST">
+        <form 
+        class="product-form" 
+        action="/admin/<% if (editing) { %>edit-product<% } else { %>add-product<% } %>" 
+        method="POST"
+        enctype="multipart/form-data">
             <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
             <div class="form-control">
                 <label for="title">Title</label>
@@ -22,7 +26,7 @@
                 class="<%= validationErrors.find(e => e.path === 'title')? 'error': '' %>"
                 />
             </div>
-            <div class="form-control">
+            <!-- <div class="form-control">
                 <label for="imageUrl">Image URL</label>
                 <input 
                 type="text" 
@@ -30,6 +34,14 @@
                 id="imageUrl"
                 value="<% if (editing || hasError) { %><%= product.imageUrl %><% } %>"
                 class="<%= validationErrors.find(e => e.path === 'imageUrl')? 'error': '' %>"
+                />
+            </div> -->
+            <div class="form-control">
+                <label for="imageUrl">Image</label>
+                <input 
+                type="file" 
+                name="image" 
+                id="image"
                 />
             </div>
             <div class="form-control">

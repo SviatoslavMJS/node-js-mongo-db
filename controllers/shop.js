@@ -1,3 +1,7 @@
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
+
 const Product = require("../models/product");
 const Order = require("../models/orders");
 
@@ -140,4 +144,56 @@ exports.postOrder = (req, res, next) => {
       error.httpStatusCode = 500;
       return next(error);
     });
+};
+
+exports.getInvoice = (req, res, next) => {
+  const { orderId } = req.params;
+  const invoiceName = `Invoice-${orderId}.pdf`;
+  const invoicePath = path.join("data", "invoices", invoiceName);
+
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return next(new Error("No order found."));
+      }
+      if (order.user.userId.toString() !== req.user._id.toString()) {
+        return next(new Error("Access denied."));
+      }
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Deposition", `inline`);
+      const pdfDoc = new PDFDocument({
+        margins: {
+          top: 50,
+          bottom: 50,
+          left: 72,
+          right: 72,
+        },
+      });
+      pdfDoc.pipe(fs.createWriteStream(invoicePath));
+      pdfDoc.pipe(res);
+
+      let totalPrice = 0;
+      pdfDoc.fontSize(26).text(`Invoice - ${orderId}`);
+      pdfDoc.text(new Array(30).fill("_").join(""), { lineGap: 20 });
+      order.products.forEach(({ product, quantity }) => {
+        const itemTotal = quantity * product.price;
+        totalPrice += itemTotal;
+        pdfDoc
+          .fontSize(14)
+          .text(
+            `${product.title} ------------- ${quantity}pcs -------- $${product.price} -------- $${itemTotal}`
+          );
+      });
+      pdfDoc
+        .fontSize(22)
+        .text(new Array(30).fill("_").join(""), { lineGap: 20 });
+      pdfDoc
+        .fontSize(22)
+        .fill("red")
+        .text(`Total ${new Array(30).fill("-").join("")} $${totalPrice}`);
+
+      pdfDoc.end();
+    })
+    .catch((err) => next(err));
 };
