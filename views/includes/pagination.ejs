@@ -1,0 +1,27 @@
+<section class="pagination">
+    <% new Array(pagesCount ?? 1).fill('').forEach((_,idx) => { %>
+
+      <% if(idx === 0 
+      || pagesCount<=5 
+      || idx + 1 === pagesCount 
+      || currentPage === idx 
+      || currentPage === idx+2 
+      || currentPage === idx+1 
+      ){ %>
+
+      <% if(pagesCount > 5 
+      && idx + 1 === pagesCount 
+      && currentPage + 1 !== pagesCount 
+      && currentPage !== idx+1 
+      ){ %>
+         <div class="pagination-vector">></div>
+      <% } %>
+
+      <a class="<%= currentPage === (idx + 1) ? 'active' : '' %>" href="?page=<%= idx + 1 %>"><%= idx + 1 %></a>
+
+      <% if(pagesCount > 5 && idx === 0 && currentPage >= 3 ){ %>
+        <div class="pagination-vector"><</div>
+      <% } %>
+
+    <% } }) %>
+</section>

@@ -5,13 +5,26 @@ const PDFDocument = require("pdfkit");
 const Product = require("../models/product");
 const Order = require("../models/orders");
 
+const ITEMS_PER_PAGE = 1;
+
 exports.getProducts = (req, res, next) => {
-  Product.find()
+  const { page } = req.query;
+  let itemsCount = 0;
+  return Product.find()
+    .countDocuments()
+    .then((count) => {
+      itemsCount = count;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((products) => {
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
         path: "/products",
+        currentPage: page ?? 1,
+        pagesCount: Math.ceil(itemsCount / ITEMS_PER_PAGE),
       });
     })
     .catch((err) => {
@@ -41,12 +54,23 @@ exports.getProduct = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
+  const page = +req.query.page ?? 1;
+  let totalCount = 0;
   Product.find()
+    .countDocuments()
+    .then((count) => {
+      totalCount = count;
+      return Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE);
+    })
     .then((prods) => {
       res.render("shop/index", {
         prods: prods,
         pageTitle: "Shop",
         path: "/",
+        pagesCount: Math.ceil(totalCount / ITEMS_PER_PAGE),
+        currentPage: page,
       });
     })
     .catch((err) => {

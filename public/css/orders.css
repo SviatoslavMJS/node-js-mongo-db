@@ -9,10 +9,17 @@
     font-size: 1rem;
 }
 
+.invoice {
+  text-decoration: none;
+  color: rgb(67, 67, 243)
+}
+
 .orders__item {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   padding: 1rem;
   margin-bottom: 1rem;
+  border: 1px solid rgb(47, 93, 47);
+  border-radius: 8px;
 }
 
 .orders__products {
